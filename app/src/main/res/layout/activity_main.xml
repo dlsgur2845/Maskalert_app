@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_margin="8dp">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/notice_alpha_black_40dp"
+            android:layout_marginRight="20dp"
+            android:background="#FCFCFC"/>
+
+        <EditText
+            android:id="@+id/bornYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:hint="출생년도"
+            android:inputType="numberDecimal"
+            android:maxLength="4"/>
+
+        <EditText
+            android:id="@+id/range"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:cursorVisible="false"
+            android:hint="반경(1~10km)"
+            android:inputType="numberDecimal"
+            android:maxLength="2"/>
+    
+        <Button
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="검색"
+            android:enabled="false"/>
+
+    </LinearLayout>
+    
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <fragment android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/map"
+            android:name="com.naver.maps.map.MapFragment" />
+
+        <ImageButton
+            android:id="@+id/locationOFF"
+            android:layout_width="37dp"
+            android:layout_height="37dp"
+            android:src="@drawable/my_location_black_24dp"
+            android:layout_margin="12dp"
+            android:background="@drawable/custom_button"
+            android:layout_gravity="end|top" />
+
+        <ImageButton
+            android:id="@+id/locationON"
+            android:layout_width="37dp"
+            android:layout_height="37dp"
+            android:src="@drawable/my_location_blue_30dp"
+            android:layout_margin="12dp"
+            android:background="@drawable/custom_button"
+            android:layout_gravity="end|top" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="개발자 : 송인혁"
+            android:layout_gravity="bottom|right"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_margin="10dp"
+            android:layout_gravity="top|center"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:background="@color/colorBackground">
+
+            <EditText
+                android:id="@+id/MON"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:background="@color/colorActivated"
+                android:text="월"/>
+            <EditText
+                android:id="@+id/TUE"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:background="@color/colorActivated"
+                android:text="화"/>
+            <EditText
+                android:id="@+id/WED"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:background="@color/colorActivated"
+                android:text="수"/>
+            <EditText
+                android:id="@+id/THU"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:background="@color/colorActivated"
+                android:text="목"/>
+            <EditText
+                android:id="@+id/FRI"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:background="@color/colorActivated"
+                android:text="금"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:background="@color/colorActivated"
+                android:text="토"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:background="@color/colorActivated"
+                android:text="일"/>
+
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

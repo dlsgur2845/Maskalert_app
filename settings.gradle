@@ -1,0 +1,2 @@
+rootProject.name='Maskalert_app'
+include ':app'
