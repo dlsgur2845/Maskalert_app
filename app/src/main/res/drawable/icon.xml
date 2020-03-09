@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <layer-list>
+            <!-- shadow (밑으로) : 그림자 -->
+            <item android:top="30dp">
+                <shape>
+                    <corners android:radius="3dp" />
+                    <solid android:color="#03A9F4" />
+                </shape>
+            </item>
+            <!-- background (위로) -->
+            <item android:drawable="@drawable/ic_pin_drop_white_55dp">
+
+            </item>
+        </layer-list>
+    </item>
+</selector>

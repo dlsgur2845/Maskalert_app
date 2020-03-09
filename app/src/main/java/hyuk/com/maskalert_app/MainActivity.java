@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager;
 
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -212,6 +213,8 @@ public class MainActivity extends AppCompatActivity{
         // GPS
         locationViewOFF.setVisibility(View.GONE);
         locationViewON.setVisibility(View.VISIBLE);
+
+        // 좌표 받아오기
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST);
         locationSource.activate(new LocationSource.OnLocationChangedListener() {
             @Override
@@ -268,5 +271,16 @@ public class MainActivity extends AppCompatActivity{
         if (locationSource != null) {
             locationSource.deactivate();
         }
+    }
+
+    private long lastTimeBackPressed;
+    @Override
+    public void onBackPressed(){
+        if(System.currentTimeMillis() - lastTimeBackPressed < 1500){
+            finish();
+            return;
+        }
+        Toast.makeText(this, "한 번 더 눌러 종료", Toast.LENGTH_SHORT).show();
+        lastTimeBackPressed = System.currentTimeMillis();
     }
 }
