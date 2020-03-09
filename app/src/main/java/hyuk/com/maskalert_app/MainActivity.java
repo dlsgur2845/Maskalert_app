@@ -107,30 +107,26 @@ public class MainActivity extends AppCompatActivity{
 
                     String colorActivated = "#FFFFFF";
                     int year = Integer.parseInt(Syear);
+                    resetWeekColor();
                     switch (year % 10) {
                         case 1:
                         case 6:
-                            resetWeekColor();
                             MON.setBackgroundColor(Color.parseColor(colorActivated));
                             break;
                         case 2:
                         case 7:
-                            resetWeekColor();
                             TUE.setBackgroundColor(Color.parseColor(colorActivated));
                             break;
                         case 3:
                         case 8:
-                            resetWeekColor();
                             WED.setBackgroundColor(Color.parseColor(colorActivated));
                             break;
                         case 4:
                         case 9:
-                            resetWeekColor();
                             THU.setBackgroundColor(Color.parseColor(colorActivated));
                             break;
                         case 5:
                         case 0:
-                            resetWeekColor();
                             FRI.setBackgroundColor(Color.parseColor(colorActivated));
                             break;
                     }
