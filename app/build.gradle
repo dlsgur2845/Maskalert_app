@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def naverMapApiKey = properties.getProperty('naver.map.key')
+
 android {
     compileSdkVersion 28
 
@@ -10,6 +14,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+        manifestPlaceholders = [naverMapApiKey:naverMapApiKey]
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -19,7 +19,7 @@
 
         <meta-data
             android:name="com.naver.maps.map.CLIENT_ID"
-            android:value="gmr8c1lhx6"></meta-data>
+            android:value="${naverMapApiKey}"></meta-data>
     </application>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
