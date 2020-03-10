@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">마스크 알림</string>
-    <string name="static_notice">마스크 수량은 정보는 5분의 오차가 있습니다.</string>
+    <string name="static_notice">마스크 수량 정보는 5분의 오차가 있습니다.</string>
     <string name="gps_user_guide">지도 상단의 GPS 버튼을 활성화하면 실시간 내 위치를 트래킹할 수 있습니다.</string>
 </resources>
