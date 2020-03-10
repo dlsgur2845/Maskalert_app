@@ -6,4 +6,5 @@
 
     <color name="colorBackground">#66000000</color>
     <color name="colorActivated">#FFFFFF</color>
+    <color name="colorApplication">#03A9F4</color>
 </resources>

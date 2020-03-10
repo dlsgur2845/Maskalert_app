@@ -5,15 +5,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity{
     private NaverMap map;
     private ImageView locationViewOFF;
     private ImageView locationViewON;
+    private LocationOverlay locationOverlay;
 
     private ArrayList<Loc> locations;
     private ArrayList<Store> stores;
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity{
     EditText bornYear;
     EditText range;
     Button search;
+    ImageButton notice;
     TextView MON;
     TextView TUE;
     TextView WED;
@@ -66,6 +69,7 @@ public class MainActivity extends AppCompatActivity{
 
         locationViewOFF = (ImageView)findViewById(R.id.locationOFF);
         locationViewON = (ImageView)findViewById(R.id.locationON);
+        notice = (ImageButton)findViewById(R.id.notice);
     }
 
     void resetWeekColor() {
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity{
 
         LatLng coord = new LatLng(location);
 
-        LocationOverlay locationOverlay = map.getLocationOverlay();
+        locationOverlay = map.getLocationOverlay();
         locationOverlay.setVisible(true);
         locationOverlay.setPosition(coord);
         locationOverlay.setBearing(location.getBearing());
@@ -94,6 +98,14 @@ public class MainActivity extends AppCompatActivity{
     }
 
     void actionObject() {
+        notice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), NoticeActivity.class);
+                startActivity(intent);
+            }
+        });
+
         bornYear.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -183,6 +195,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 if(locationSource != null){
+                    locationOverlay.setVisible(false);
                     locationSource.deactivate();
                     Toast.makeText(MainActivity.this, "현재 위치 탐색 중지", Toast.LENGTH_SHORT).show();
 
@@ -256,6 +269,9 @@ public class MainActivity extends AppCompatActivity{
 //            }
 //        });
 //        thread.start();
+
+        Intent intent = new Intent(getApplicationContext(), NoticeActivity.class);
+        startActivity(intent);
     }
 
     @Override
