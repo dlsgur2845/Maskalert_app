@@ -20,6 +20,7 @@ import hyuk.com.maskalert_app.object.Store;
 public class StoreAdapter {
     private List<Marker> markers;
     private Context context;
+    private boolean hide;
 
     private List<InfoWindow> infoWindows;
 
@@ -48,7 +49,8 @@ public class StoreAdapter {
                     @NonNull
                     @Override
                     public CharSequence getText(@NonNull InfoWindow infoWindow) {
-                        return "[" + store.getName()+ "]\n" + store.getAddr();
+                        return "[" + store.getName()+ "]\n" + store.getAddr() +
+                                "\n최근 업데이트 :" + store.getCreated_at();
                     }
                 });
                 infoWindows.add(infoWindow);
@@ -79,7 +81,17 @@ public class StoreAdapter {
                 else{ // plenty
 
                 }
-                marker.setMap(map);
+
+                if(store.getRemain_stat().equals("empty")){
+                    if(hide)
+                        marker.setMap(null);
+                    else
+                        marker.setMap(map);
+                }
+                else{
+                    marker.setMap(map);
+                }
+                markers.add(marker);
             }
             // 지도를 클릭하면 정보 창을 닫음
             map.setOnMapClickListener((coord, point) -> {
@@ -95,5 +107,21 @@ public class StoreAdapter {
             markers.get(i).setMap(null);
         }
         markers.clear();
+    }
+
+    public void hideSoldOut(List<Store> stores, NaverMap map, boolean hide){
+        this.hide = hide;
+        for(int i=0;i<stores.size();i++){
+            if(stores.get(i).getRemain_stat().equals("empty")){
+                if(hide) {
+                    if (markers.get(i).getMap() != null)
+                        markers.get(i).setMap(null);
+                }
+                else{
+                    if(markers.get(i).getMap() == null)
+                        markers.get(i).setMap(map);
+                }
+            }
+        }
     }
 }

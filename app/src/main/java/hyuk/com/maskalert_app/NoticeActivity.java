@@ -38,6 +38,7 @@ public class NoticeActivity extends Activity {
         noticeList.add(new Notice(getText(R.string.static_notice).toString(), ""));
         noticeList.add(new Notice(getText(R.string.gps_user_guide).toString(), ""));
         noticeList.add(new Notice(getText(R.string.gps_err).toString(), ""));
+        noticeList.add(new Notice(getText(R.string.soldout).toString(), ""));
 
         adpater = new NoticeAdpater(noticeList, this);
         listView.setAdapter(adpater);

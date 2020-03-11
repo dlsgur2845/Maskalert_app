@@ -1,7 +1,5 @@
 package hyuk.com.maskalert_app.connection.raa;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
 import java.util.HashMap;
@@ -14,18 +12,7 @@ public class RestApiAction extends StringRequest {
     protected Map<String, String> parameters;
 
     public RestApiAction(String url, final NetworkResultListener networkResultListener) {
-        super(Method.GET, url, new Response.Listener<String>() {
-
-            @Override
-            public void onResponse(String response) {
-                networkResultListener.onResponse(response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                networkResultListener.onError(error);
-            }
-        });
+        super(Method.GET, url, response -> networkResultListener.onResponse(response), error -> networkResultListener.onError(error));
         parameters = new HashMap<>();
     }
 

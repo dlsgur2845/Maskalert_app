@@ -28,24 +28,23 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
             android:hint="출생년도"
+            android:gravity="center_horizontal"
             android:inputType="numberDecimal"
             android:maxLength="4"/>
 
         <EditText
-            android:id="@+id/range"
-            android:layout_width="wrap_content"
+            android:id="@+id/address"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:cursorVisible="false"
-            android:hint="반경(1~10km)"
-            android:inputType="numberDecimal"
-            android:maxLength="2"/>
+            android:hint="주소"
+            android:gravity="center_horizontal" />
     
         <Button
             android:id="@+id/search"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:text="검색"
-            android:enabled="false"/>
+            android:text="검색" />
 
     </LinearLayout>
     
@@ -73,7 +72,7 @@
                 android:textStyle="bold"
                 android:textSize="12dp"
                 android:textColor="#FFFFFF"
-                android:background="#952196F3"/>
+                android:background="#AD4CAF50"/>
             <TextView
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
@@ -122,15 +121,29 @@
             android:background="@drawable/custom_button_white"
             android:layout_gravity="end|top" />
 
+        <Button
+            android:id="@+id/soldOut"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_button_black"
+            android:layout_gravity="end|top"
+            android:layout_marginTop="65dp"
+            android:layout_marginRight="5dp"
+            android:text="품절"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="개발자 : 송인혁"
+            android:text="개발자 : 송인혁\n데이터 제공 : 공공데이터포털"
+            android:gravity="right"
             android:layout_gravity="bottom|right"/>
 
         <LinearLayout
-            android:layout_width="150dp"
-            android:layout_height="35dp"
+            android:layout_width="190dp"
+            android:layout_height="40dp"
             android:layout_margin="10dp"
             android:layout_gravity="top|center"
             android:gravity="center"
@@ -141,55 +154,62 @@
                 android:id="@+id/MON"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="1dp"
-                android:layout_marginRight="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
                 android:background="@color/colorActivated"
+                android:textSize="20dp"
                 android:text="월"/>
             <TextView
                 android:id="@+id/TUE"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="1dp"
-                android:layout_marginRight="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
                 android:background="@color/colorActivated"
+                android:textSize="20dp"
                 android:text="화"/>
             <TextView
                 android:id="@+id/WED"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="1dp"
-                android:layout_marginRight="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
                 android:background="@color/colorActivated"
+                android:textSize="20dp"
                 android:text="수"/>
             <TextView
                 android:id="@+id/THU"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="1dp"
-                android:layout_marginRight="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
                 android:background="@color/colorActivated"
+                android:textSize="20dp"
                 android:text="목"/>
             <TextView
                 android:id="@+id/FRI"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="1dp"
-                android:layout_marginRight="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
                 android:background="@color/colorActivated"
+                android:textSize="20dp"
                 android:text="금"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="1dp"
-                android:layout_marginRight="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
                 android:background="@color/colorActivated"
+                android:textSize="20dp"
                 android:text="토"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="1dp"
-                android:layout_marginRight="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
                 android:background="@color/colorActivated"
+                android:textSize="20dp"
                 android:text="일"/>
 
         </LinearLayout>

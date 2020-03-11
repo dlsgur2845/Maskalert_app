@@ -12,8 +12,8 @@ android {
         applicationId "hyuk.com.maskalert_app"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.1.0"
         manifestPlaceholders = [naverMapApiKey: naverMapApiKey]
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

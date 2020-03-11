@@ -1,6 +1,10 @@
 <resources>
+    <string name="NAVER_API_ID">gmr8c1lhx6</string>
+    <string name="NAVER_API_KEY">Bw12tNuNkXTaa1QJsktMVQDKRqUIqqq8h1YuKTpb</string>
+
     <string name="app_name">마스크 알림</string>
     <string name="static_notice">마스크 수량 정보는 5분의 오차가 있습니다.</string>
     <string name="gps_user_guide">지도 상단의 GPS 버튼을 활성화하면 실시간 내 위치를 트래킹할 수 있습니다.</string>
     <string name="gps_err">지도 상의 위치와 약국의 위치는 수십 미터 이내의 오차가 있습니다.</string>
+    <string name="soldout">품절 버튼을 눌러 품절된 약국은 숨기세요.</string>
 </resources>

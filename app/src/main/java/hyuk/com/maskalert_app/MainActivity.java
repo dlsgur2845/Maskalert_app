@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.VolleyError;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraUpdate;
 import com.naver.maps.map.LocationSource;
@@ -36,26 +34,28 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 import hyuk.com.maskalert_app.adapter.StoreAdapter;
-import hyuk.com.maskalert_app.connection.APIHelper;
-import hyuk.com.maskalert_app.connection.NetworkResultListener;
 import hyuk.com.maskalert_app.connection.RestURL;
-import hyuk.com.maskalert_app.connection.raa.GetMaskRAA;
-import hyuk.com.maskalert_app.object.Loc;
+import hyuk.com.maskalert_app.object.Addr;
 import hyuk.com.maskalert_app.object.Store;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
+    // 인텐트
+    private int REQUEST_CODE = 1;
+
     // 위치 정보
     private static final int LOCATION_PERMISSION_REQUEST = 1000;
     private FusedLocationSource locationSource;
     LatLng coord;
+    GetByGeo getByGeo;
+    Geocoding geocoding;
 
     // 네이버 맵
     private NaverMap map;
@@ -65,12 +65,14 @@ public class MainActivity extends AppCompatActivity{
     StoreAdapter storeAdapter;
     private boolean fixMap = true;
 
+    private boolean soldOutVisible = true;
     private List<Store> stores;
 
     // 액티비티 객체
     EditText bornYear;
-    EditText range;
+    EditText address;
     Button search;
+    Button soldOut;
     ImageButton notice;
     TextView MON;
     TextView TUE;
@@ -96,7 +98,9 @@ public class MainActivity extends AppCompatActivity{
         mapFragment.getMapAsync(naverMap -> map = naverMap);
 
         // GPS
+        locationViewOFF.setEnabled(false);
         locationViewOFF.setVisibility(View.GONE);
+        locationViewON.setEnabled(true);
         locationViewON.setVisibility(View.VISIBLE);
 
         // 좌표 생성
@@ -119,17 +123,18 @@ public class MainActivity extends AppCompatActivity{
 
     void createObject() {
         bornYear = (EditText) findViewById(R.id.bornYear);
-        range = (EditText) findViewById(R.id.range);
+        address = (EditText) findViewById(R.id.address);
         search = (Button) findViewById(R.id.search);
+        soldOut = (Button) findViewById(R.id.soldOut);
         MON = (TextView) findViewById(R.id.MON);
         TUE = (TextView) findViewById(R.id.TUE);
         WED = (TextView) findViewById(R.id.WED);
         THU = (TextView) findViewById(R.id.THU);
         FRI = (TextView) findViewById(R.id.FRI);
 
-        locationViewOFF = (ImageView)findViewById(R.id.locationOFF);
-        locationViewON = (ImageView)findViewById(R.id.locationON);
-        notice = (ImageButton)findViewById(R.id.notice);
+        locationViewOFF = (ImageView) findViewById(R.id.locationOFF);
+        locationViewON = (ImageView) findViewById(R.id.locationON);
+        notice = (ImageButton) findViewById(R.id.notice);
     }
 
     void resetWeekColor() {
@@ -141,7 +146,7 @@ public class MainActivity extends AppCompatActivity{
         FRI.setBackgroundColor(colorDeafult);
     }
 
-    void LocationEvent(@NonNull Location location){
+    void LocationEvent(@NonNull Location location) {
         // gps 이벤트
         if (map == null || location == null) {
             return;
@@ -154,14 +159,38 @@ public class MainActivity extends AppCompatActivity{
         locationOverlay.setPosition(coord);
         locationOverlay.setBearing(location.getBearing());
 
-        if(fixMap) {
+        if (fixMap) {
             map.moveCamera(CameraUpdate.scrollTo(coord));
             fixMap = false;
         }
-        new BackgroundTask().execute();
+        if (getByGeo != null) {
+            try {
+                if (getByGeo.getStatus() == AsyncTask.Status.RUNNING) {
+                    getByGeo.cancel(true);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        getByGeo = new GetByGeo();
+        getByGeo.execute();
     }
 
     void actionObject() {
+        soldOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (soldOutVisible) {
+                    soldOutVisible = false;
+                    soldOut.setTextColor(Color.rgb(0x50, 0x50, 0x50));
+                } else {
+                    soldOutVisible = true;
+                    soldOut.setTextColor(Color.rgb(0xFF, 0xFF, 0xFF));
+                }
+                storeAdapter.hideSoldOut(stores, map, !soldOutVisible);
+            }
+        });
+
         notice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -215,43 +244,43 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-        range.addTextChangedListener(new TextWatcher() {
+        search.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
+            public void onClick(View view) {
+                if (!locationViewOFF.isEnabled())
+                    locationViewON.callOnClick();
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String Srange = range.getText().toString();
-                if (Srange.length() == 0) {
-                    search.setEnabled(false);
-                    return;
+                try {
+                    if (geocoding != null) {
+                        if (geocoding.getStatus() == AsyncTask.Status.RUNNING) {
+                            geocoding.cancel(true);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                if (Integer.parseInt(Srange) < 1 || Integer.parseInt(Srange) > 10) {
-                    Toast.makeText(MainActivity.this, "1 ~ 10 사이로 지정해 주세요.", Toast.LENGTH_LONG).show();
-                    search.setEnabled(false);
-                } else search.setEnabled(true);
-            }
 
-            @Override
-            public void afterTextChanged(Editable editable) {
+                geocoding = new Geocoding();
+                geocoding.execute();
             }
         });
 
         locationViewOFF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "현재 위치 탐색 시작", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "정보 업데이트 시작", Toast.LENGTH_SHORT).show();
+                fixMap = true;
                 if (locationSource != null) {
                     locationSource.activate(new LocationSource.OnLocationChangedListener() {
                         @Override
                         public void onLocationChanged(@Nullable Location location) {
-                            fixMap = true;
                             LocationEvent(location);
                         }
                     });
 
+                    locationViewOFF.setEnabled(false);
                     locationViewOFF.setVisibility(View.GONE);
+                    locationViewON.setEnabled(true);
                     locationViewON.setVisibility(View.VISIBLE);
                 }
             }
@@ -259,12 +288,14 @@ public class MainActivity extends AppCompatActivity{
         locationViewON.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(locationSource != null){
+                if (locationSource != null) {
                     locationOverlay.setVisible(false);
                     locationSource.deactivate();
-                    Toast.makeText(MainActivity.this, "현재 위치 탐색 중지", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "정보 업데이트 중지", Toast.LENGTH_SHORT).show();
 
+                    locationViewON.setEnabled(false);
                     locationViewON.setVisibility(View.GONE);
+                    locationViewOFF.setEnabled(true);
                     locationViewOFF.setVisibility(View.VISIBLE);
                 }
             }
@@ -286,9 +317,10 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private long lastTimeBackPressed;
+
     @Override
-    public void onBackPressed(){
-        if(System.currentTimeMillis() - lastTimeBackPressed < 1500){
+    public void onBackPressed() {
+        if (System.currentTimeMillis() - lastTimeBackPressed < 1500) {
             finish();
             return;
         }
@@ -296,7 +328,26 @@ public class MainActivity extends AppCompatActivity{
         lastTimeBackPressed = System.currentTimeMillis();
     }
 
-    class BackgroundTask extends AsyncTask<Void, Void, String> {
+    @Override
+    public void onDestroy() {
+        try {
+            if (getByGeo != null) {
+                if (getByGeo.getStatus() == AsyncTask.Status.RUNNING) {
+                    getByGeo.cancel(true);
+                }
+            }
+            if (geocoding != null) {
+                if (geocoding.getStatus() == AsyncTask.Status.RUNNING) {
+                    geocoding.cancel(true);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
+    }
+
+    class GetByGeo extends AsyncTask<Void, Void, String> {
 
         String target;
 
@@ -305,10 +356,9 @@ public class MainActivity extends AppCompatActivity{
             try {
                 target = RestURL.storesByGeo +
                         "?lat=" + URLEncoder.encode(coord.latitude + "", "utf-8")
-                +"&lng=" + URLEncoder.encode(coord.longitude+"", "utf-8")
-                +"&m=" + URLEncoder.encode("2500", "utf-8");
-            }
-            catch (Exception e){
+                        + "&lng=" + URLEncoder.encode(coord.longitude + "", "utf-8")
+                        + "&m=" + URLEncoder.encode("2500", "utf-8");
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -385,6 +435,121 @@ public class MainActivity extends AppCompatActivity{
             }
             // 마커 등록
             storeAdapter.setMarkers(stores, map);
+        }
+    }
+
+    class Geocoding extends AsyncTask<Void, Void, String> {
+
+        String target;
+
+        @Override
+        protected void onPreExecute() {
+            String query = address.getText().toString();
+            try {
+                target = RestURL.Geocoding +
+                        "?query=" + URLEncoder.encode(query, "utf-8"); // coordinate
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            String clientId = getText(R.string.NAVER_API_ID).toString();//애플리케이션 클라이언트 아이디값";
+            String clientSecret = getText(R.string.NAVER_API_KEY).toString();//애플리케이션 클라이언트 시크릿값";
+            try {
+                URL url = new URL(target);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestProperty("X-NCP-APIGW-API-KEY-ID", clientId);
+                httpURLConnection.setRequestProperty("X-NCP-APIGW-API-KEY", clientSecret);
+                InputStream inputStream = httpURLConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String tmp;
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((tmp = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(tmp + "\n");
+                }
+                bufferedReader.close();
+                httpURLConnection.disconnect();
+                return stringBuilder.toString().trim();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        public void onProgressUpdate(Void... values) {
+            super.onProgressUpdate();
+        }
+
+        @Override
+        public void onPostExecute(String response) {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                String status = jsonObject.getString("status");
+                if (!status.equals("OK")) return;
+
+                JSONArray jsonArray = jsonObject.getJSONArray("addresses");
+                int count = 0;
+
+                double _lat;
+                double _lng;
+                String jibunAddress;
+
+                List<Addr> addrList = new ArrayList<Addr>();
+
+                while (count < jsonArray.length()) {
+                    JSONObject object = jsonArray.getJSONObject(count);
+
+                    _lat = object.getDouble("y");
+                    _lng = object.getDouble("x");
+                    jibunAddress = object.getString("jibunAddress");
+
+                    addrList.add(new Addr(_lat, _lng, jibunAddress));
+                    count++;
+                }
+                Intent intent = new Intent(MainActivity.this, AddressActivity.class);
+                intent.putExtra("addrList", (Serializable) addrList);
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            // 마커 등록
+            storeAdapter.setMarkers(stores, map);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                double lat = data.getDoubleExtra("lat", 0);
+                double lng = data.getDoubleExtra("lng", 0);
+
+                coord = new LatLng(lat, lng);
+
+                locationOverlay = map.getLocationOverlay();
+                locationOverlay.setVisible(true);
+                locationOverlay.setPosition(coord);
+
+                map.moveCamera(CameraUpdate.scrollTo(coord));
+
+                try {
+                    if (getByGeo != null) {
+                        if (getByGeo.getStatus() == AsyncTask.Status.RUNNING) {
+                            getByGeo.cancel(true);
+                        }
+                        getByGeo = new GetByGeo();
+                        getByGeo.execute();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
