@@ -43,6 +43,12 @@ public class StoreAdapter {
                 marker.setCaptionText(store.getName());
                 marker.setCaptionColor(Color.BLUE);
 
+                String created_at;
+                if(store.getCreated_at().equals("null"))
+                    created_at = "정보 없음(실제 수량과 일치하지 않을 수 있습니다.)";
+                else
+                    created_at = store.getCreated_at();
+
                 // 정보 창
                 InfoWindow infoWindow = new InfoWindow();
                 infoWindow.setAdapter(new InfoWindow.DefaultTextAdapter(context) {
@@ -50,7 +56,7 @@ public class StoreAdapter {
                     @Override
                     public CharSequence getText(@NonNull InfoWindow infoWindow) {
                         return "[" + store.getName()+ "]\n" + store.getAddr() +
-                                "\n최근 업데이트 :" + store.getCreated_at();
+                                "\n최근 업데이트 :" + created_at;
                     }
                 });
                 infoWindows.add(infoWindow);

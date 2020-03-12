@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -177,6 +178,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void actionObject() {
+        address.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                switch(i){
+                    case KeyEvent.KEYCODE_ENTER:
+                        search.callOnClick();
+                }
+                return true;
+            }
+        });
         soldOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -373,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
                 String tmp;
                 StringBuilder stringBuilder = new StringBuilder();
                 while ((tmp = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(tmp + "\n");
+                    stringBuilder.append(tmp).append("\n");
                 }
                 bufferedReader.close();
                 httpURLConnection.disconnect();
@@ -550,6 +561,10 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+            else{
+                locationViewOFF.callOnClick();
+            }
         }
+        onResume();
     }
 }
