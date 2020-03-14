@@ -10,7 +10,6 @@ import java.util.List;
 
 import hyuk.com.maskalert_app.R;
 import hyuk.com.maskalert_app.object.Addr;
-import hyuk.com.maskalert_app.object.Notice;
 
 public class AddressAdapter extends BaseAdapter {
     private List<Addr> addrList;
@@ -40,10 +39,12 @@ public class AddressAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         View v = View.inflate(context, R.layout.addr, null);
         TextView jibunaddress = (TextView)v.findViewById(R.id.jibunaddress);
+        TextView buildingName = (TextView)v.findViewById(R.id.buildingName);
 
         jibunaddress.setText(addrList.get(i).getJibunAddress());
+        buildingName.setText(addrList.get(i).getBuildingName());
 
-        v.setTag(addrList.get(i).getJibunAddress());
+        v.setTag(addrList.get(i).getBuildingName());
         return v;
     }
 }

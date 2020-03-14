@@ -1,10 +1,5 @@
 package hyuk.com.maskalert_app;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
@@ -20,6 +15,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraUpdate;
@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         stores = new ArrayList<Store>();
 
         // 현재 위치 받아오기
+        Toast.makeText(MainActivity.this, "위치 수신중..\n GPS 활성 상태를 확인해주세요", Toast.LENGTH_SHORT).show();
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST);
         locationSource.activate(new LocationSource.OnLocationChangedListener() {
             @Override
@@ -136,6 +137,8 @@ public class MainActivity extends AppCompatActivity {
         locationViewOFF = (ImageView) findViewById(R.id.locationOFF);
         locationViewON = (ImageView) findViewById(R.id.locationON);
         notice = (ImageButton) findViewById(R.id.notice);
+
+        coord = new LatLng(37.5535582,126.9669724);
     }
 
     void resetWeekColor() {
@@ -177,15 +180,37 @@ public class MainActivity extends AppCompatActivity {
         getByGeo.execute();
     }
 
+    void LocationEvent(LatLng coord) {
+        // gps 이벤트
+
+        locationOverlay = map.getLocationOverlay();
+        locationOverlay.setVisible(true);
+        locationOverlay.setPosition(coord);
+
+        map.moveCamera(CameraUpdate.scrollTo(coord));
+
+        if (getByGeo != null) {
+            try {
+                if (getByGeo.getStatus() == AsyncTask.Status.RUNNING) {
+                    getByGeo.cancel(true);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        getByGeo = new GetByGeo();
+        getByGeo.execute();
+    }
+
     void actionObject() {
         address.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                switch(i){
-                    case KeyEvent.KEYCODE_ENTER:
-                        search.callOnClick();
+                if (i == KeyEvent.KEYCODE_ENTER){
+                    search.callOnClick();
+                    return true;
                 }
-                return true;
+                return false;
             }
         });
         soldOut.setOnClickListener(new View.OnClickListener() {
@@ -299,7 +324,11 @@ public class MainActivity extends AppCompatActivity {
         locationViewON.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (locationSource != null) {
+                if(locationOverlay == null){
+                    Toast.makeText(MainActivity.this, "위치 수신중..\n GPS 활성 상태를 확인해주세요", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                else if (locationSource != null && locationOverlay != null) {
                     locationOverlay.setVisible(false);
                     locationSource.deactivate();
                     Toast.makeText(MainActivity.this, "정보 업데이트 중지", Toast.LENGTH_SHORT).show();
@@ -402,6 +431,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPostExecute(String response) {
+            // thread err handling
+            if(geocoding != null){
+                if(geocoding.getStatus() == Status.RUNNING){
+                    geocoding.cancel(true);
+                }
+            }
+
             try {
                 JSONObject jsonObject = new JSONObject(response);
                 int result = jsonObject.getInt("count");
@@ -457,8 +493,10 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             String query = address.getText().toString();
             try {
-                target = RestURL.Geocoding +
-                        "?query=" + URLEncoder.encode(query, "utf-8"); // coordinate
+                target = RestURL.SearchPlace +
+                        "?query=" + URLEncoder.encode(query, "utf-8") +
+                "&x=" + URLEncoder.encode(coord.longitude+"", "utf-8") +
+                "&y=" + URLEncoder.encode(coord.latitude+"", "utf-8"); // coordinate
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -466,13 +504,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void... voids) {
-            String clientId = getText(R.string.NAVER_API_ID).toString();//애플리케이션 클라이언트 아이디값";
-            String clientSecret = getText(R.string.NAVER_API_KEY).toString();//애플리케이션 클라이언트 시크릿값";
+            //String clientId = getText(R.string.NAVER_API_ID).toString();//애플리케이션 클라이언트 아이디값";
+            String clientSecret = getText(R.string.Kakao_API_KEY).toString();//애플리케이션 클라이언트 시크릿값";
             try {
                 URL url = new URL(target);
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setRequestProperty("X-NCP-APIGW-API-KEY-ID", clientId);
-                httpURLConnection.setRequestProperty("X-NCP-APIGW-API-KEY", clientSecret);
+//                httpURLConnection.setRequestProperty("X-NCP-APIGW-API-KEY-ID", clientId);
+//                httpURLConnection.setRequestProperty("X-NCP-APIGW-API-KEY", clientSecret);
+                httpURLConnection.setRequestProperty("Authorization", clientSecret);
                 InputStream inputStream = httpURLConnection.getInputStream();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String tmp;
@@ -498,15 +537,16 @@ public class MainActivity extends AppCompatActivity {
         public void onPostExecute(String response) {
             try {
                 JSONObject jsonObject = new JSONObject(response);
-                String status = jsonObject.getString("status");
-                if (!status.equals("OK")) return;
+//                String status = jsonObject.getString("status");
+//                if (!status.equals("OK")) return;
 
-                JSONArray jsonArray = jsonObject.getJSONArray("addresses");
+                JSONArray jsonArray = jsonObject.getJSONArray("documents");
                 int count = 0;
 
                 double _lat;
                 double _lng;
                 String jibunAddress;
+                String buildingName;
 
                 List<Addr> addrList = new ArrayList<Addr>();
 
@@ -515,9 +555,10 @@ public class MainActivity extends AppCompatActivity {
 
                     _lat = object.getDouble("y");
                     _lng = object.getDouble("x");
-                    jibunAddress = object.getString("jibunAddress");
+                    jibunAddress = object.getString("road_address_name");
+                    buildingName = object.getString("place_name");;
 
-                    addrList.add(new Addr(_lat, _lng, jibunAddress));
+                    addrList.add(new Addr(_lat, _lng, jibunAddress, buildingName));
                     count++;
                 }
                 Intent intent = new Intent(MainActivity.this, AddressActivity.class);
@@ -547,7 +588,7 @@ public class MainActivity extends AppCompatActivity {
                 locationOverlay.setVisible(true);
                 locationOverlay.setPosition(coord);
 
-                map.moveCamera(CameraUpdate.scrollTo(coord));
+                LocationEvent(coord);
 
                 try {
                     if (getByGeo != null) {

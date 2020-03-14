@@ -11,4 +11,5 @@ public class RestURL {
 
     // 네이버
     public static final String Geocoding = "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode";
+    public static final String SearchPlace = "https://dapi.kakao.com/v2/local/search/keyword.json";
 }
